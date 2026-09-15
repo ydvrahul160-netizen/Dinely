@@ -3,7 +3,6 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import gentoken from "../utils/token.js";
 
-
 //------------------------------------ SIGN UP CONTROLLER --------------------------------------------
 export const signUp = async (req, res) => {
   try {
@@ -50,18 +49,17 @@ export const signUp = async (req, res) => {
 //------------------------------------ SIGN IN CONTROLLER --------------------------------------------
 export const signIn = async (req, res) => {
   try {
-    const {  email, password } = req.body;
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User does not exist" });
     }
 
-    const isMatch = await bcrypt.compare(password,user.password)
-    if(!isMatch){
-        return res.status(400).json({ message: "Incorrect Password" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect Password" });
     }
 
-   
     const token = await gentoken(User._id);
 
     response.cookie("token", token, {
@@ -74,5 +72,15 @@ export const signIn = async (req, res) => {
     return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json(`sign in error ${error}`);
+  }
+};
+
+//------------------------------------ SIGN IN CONTROLLER --------------------------------------------
+export const signOut = async (req, res) => {
+  try {
+    res.clearCookie("token");
+    return res.status(200).json({ message: "Log out successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: `Log out error ${error}` });
   }
 };
